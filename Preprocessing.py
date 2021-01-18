@@ -21,6 +21,8 @@ from skimage.filters import median, gaussian
 def Noise_Removal(path):
     image = io.imread(path, as_gray=True)
     med_img = median(image, disk(1), mode='constant', cval=0.0)
+    # blurred = skimage.filters.gaussian(
+    # image, sigma=(sigma, sigma), truncate=3.5, multichannel=True)
     gaus = gaussian(med_img, sigma=0.4, mode='constant', cval=0.0)
     gray = rgb2gray(gaus)
     threshold = threshold_otsu(gray)  
@@ -89,3 +91,14 @@ def getLines(cropedImage):
 
     cv2.imwrite("outputs/result.png", Neg )
     return linesArray
+
+
+
+"""
+    Preprocessing Steps
+"""
+def preprocessImage(path):
+    binImage=Noise_Removal(path)
+    croppedImage=cropImage(binImage)
+    segmentedLines=getLines(croppedImage)
+    return  segmentedLines
