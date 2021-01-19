@@ -1,4 +1,6 @@
 from ComputeSlant_feature import *
+from gaborFilter import *
+from LBP import *
 
 
 def getFeatureVector(segmentedLine):
@@ -6,6 +8,8 @@ def getFeatureVector(segmentedLine):
     # first Feature :: AngleHistogram
     feature_vector.extend(AnglesHistogram(segmentedLine))
     # second feature:: connected components
+    kernels= gabor_filter_bank()
+    feature_vector.extend(calculate_gabor_featuers(segmentedLine ,kernels))
     """
     Call Here function
     """

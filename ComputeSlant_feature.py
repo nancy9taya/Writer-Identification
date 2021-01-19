@@ -18,8 +18,8 @@ p.s:
     the edge angle is the angle between edge fragment and the horizontal
 """
 def AnglesHistogram(image):
-    print("Compute Slant feature...................\n")
-    print(image)
+    # print("Compute Slant feature...................\n")
+    # print(image)
     _,count = np.unique(image, return_counts=True) 
     countBlack=count[0]
     totalEdges=np.sum(count)
@@ -37,7 +37,7 @@ def AnglesHistogram(image):
     anglesDist = [] # contains a distribution for angles for every interval between -180 to 180
                     # will correspond to number of angles that exist in this interval
     # print("ANGLESSSSSSSSSSS")
-    print(angles)
+    # print(angles)
     anglesHist=[]
     start_angle = 10
     interval =30
@@ -56,7 +56,7 @@ def AnglesHistogram(image):
         end_angle += interval
         closed_interval=not(closed_interval)
 
-    print(np.divide(anglesHist, countBlack))
+    # print(np.divide(anglesHist, countBlack))
     return np.divide(anglesHist, countBlack)
     # end_angle = start_angle+interval
     # closedInterval=False

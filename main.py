@@ -9,39 +9,53 @@ import numpy as np
 import pandas as pd
 import cv2
 import os
+import csv
+import threading
+import time
+
+
+X_train1=[]
+X_train2=[]
+X_train3=[]
+
+Y_train1=[]
+Y_train2=[]
+Y_train3=[]
+
+X_test=[]
+Y_test=[]
 
 X_Train=[]
-X_Test=[]
 Y_Train=[]
-Y_Test=[]
+times=[]
+preds=[]
 
-def processImages(trainingFolder):
-    # writerArr=list(range(numWriters))
-    #read hand writing images from dataset training folder
-    file_list=os.listdir(trainingFolder) # get files name
-    print("in process Training iamges function.....................................")
-    print(len(file_list))
-    # for file in file_list:
-    #     segmentedLines=preprocessImage(trainingFolder+"/"+file)
-    #     for line in segmentedLines:
-    #         X_Train.extend(getFeatureVector(line)) # X_Train now is array of Segmented Lines
-    return X_Train
+Cnt_segmentedLines=[]
+# img_writer=dict()
+writer_1="1"
+writer_2="2"
+writer_3="3"
 
 
 
+# prepare X (Feature vector) and Y(the right answer) 
+def processImages(X,Y,y,imgPath):
+    segmentedLines=preprocessImage(imgPath)
+    for line in segmentedLines:
+        Y.append(y)
+        X.append(getFeatureVector(line)) 
 
-
-
-
-# def main():
+def processTestImage(imgPath):
+    segmentedLines=preprocessImage(imgPath)
+    for line in segmentedLines:
+        X_test.append(getFeatureVector(line))
+    return X_test,len(segmentedLines)
 """
 formsA-D 529
 formsE-H 395
 formsl-Z 458
 forms.txt 
 """
-trainingDataPath="formsI-Z" 
-# trainingDataPath="IAmData"
 testDataPath="TestData"
 
 """
@@ -49,22 +63,74 @@ testDataPath="TestData"
 # df = pd.read_csv('ascii/forms.csv',sep='\s+',header=None)
 # df.to_csv('ascii/form_out.csv',header=None)
 """
-Y_Train=pd.read_csv(filepath_or_buffer='ascii/form_out.csv', header=None, usecols=[1,2]);
-# data = pd.read_csv("data.csv")
-Y_train = {col: list(Y_Train[col]) for col in Y_Train.columns}
-# Y_Train=dict(Y_Train)
-# print(Y_Train['a01-000x'])
-# first_column = Y_Train.columns[0]
-# Delete first
-# Y_Train = Y_Train.drop([first_column], axis=1)
-# Y_Train.to_csv('file.csv', index=False)
-print(Y_Train)
-print("Processsing the images..............")
-# X_Train is array of feature vectors for every line in images of training data set
-# X_Train is 2-D np.array
-# Y_Train is 1-D array contains correct classification.
-X_train=processImages(trainingDataPath)
-# training(X_Train,Y_Train)
-# Y_Train=processImages(testDataPath)
+def writePrediction(pred,time):
+    fr.write(str(pred))
+    fr.write("\n")
+    ft.write(str(time))
+    ft.write("\n")
 
 
+def ReadData(testDataPath):
+    global X_Train
+    global Y_Train
+    global X_test
+    iteration_Folders=os.listdir(testDataPath)
+    for idx,folder in enumerate(iteration_Folders):
+        print("Test Case ..............", idx)
+        writers_folder=os.listdir(str(testDataPath+"/"+folder))
+        if len(writers_folder)==0:
+            continue;
+        if idx==5: ####################################to be removed 
+            return
+        # print(writers_folder)
+        for i in range(4): # loop over writers folders and test image
+            writer_folder=writers_folder[i]
+            if i==3:
+                testPath=str(testDataPath+"/"+folder+"/"+writer_folder)
+                start = time.time()
+                _,cntLines=processTestImage(testPath)
+                Cnt_segmentedLines.append(cntLines)
+                end=time.time()
+                print("Time Ellapsed ", end-start," seconds")
+                times.append(end-start)
+                continue
+            imgs=os.listdir(str(testDataPath+"/"+folder+"/"+writer_folder))
+            t1=None
+            t2=None
+            for idx,img in enumerate(imgs):
+                # print("Curreeeenttttt image",img)
+                # print("IDXXXXXXXXXXXXXXXXXX",idx)
+                if idx==0:
+                    imgPath=str(testDataPath+"/"+folder+"/"+writer_folder+"/"+img)
+                    t1 = threading.Thread(target=processImages, args=(X_train1,Y_train1,i+1,imgPath)) 
+                    t1.start()
+                if idx==1:
+                    imgPath=str(testDataPath+"/"+folder+"/"+writer_folder+"/"+img)
+                    # processImages(img,X_train2,Y_train2,i+1,imgPath)
+                    t2 =threading.Thread(target=processImages, args=(X_train2,Y_train2,i+1,imgPath)) 
+                    t2.start()
+            t1.join()
+            t2.join()
+            print("Extracting features.....................")
+            X_Train.extend(X_train1)
+            X_Train.extend(X_train2)
+            Y_Train.extend(Y_train1)
+            Y_Train.extend(Y_train2)
+        print("Fitting classifier..................")
+        training(X_Train,Y_Train)
+        print("PREDICTION BEGINS NOW ! ...............")
+        # print(X_test)
+        pred=predict_clf(X_test,Y_test)
+        writePrediction(pred,end-start)
+        print(pred)
+        X_Train=[]
+        Y_Train=[]
+        X_test=[]
+
+
+ResultsFolder="Results"
+ft = open(ResultsFolder+"/time.txt", "a")
+fr = open(ResultsFolder+"/results.txt", "a")
+ReadData("TestData")
+ft.close()
+fr.close()

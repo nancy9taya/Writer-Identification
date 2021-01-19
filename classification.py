@@ -3,7 +3,7 @@ from sklearn.ensemble import AdaBoostClassifier,VotingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
-
+import numpy as np
 
 votingClf=None
 
@@ -20,13 +20,14 @@ def training(x_train,y_train):
     return
 
 
-def predict_clf(Y_test, X_test):
+def predict_clf(X_test, Y_test):
     global votingClf
     prediction = votingClf.predict(X_test)
-    print("Actual Classes:", Y_test)
-    print("Prediction:", prediction)
-    accuracy = sum(Y_test == prediction) / len(Y_test)
-    print("The classification accuracy: " + str(accuracy))
-    if (accuracy < 1):
-        exit()
-    return
+    print(prediction)
+    final_prediction=np.bincount(prediction).argmax()
+    # final_prediction=np.argmax(array, axis = 1)) 
+    print("Prediction:", final_prediction)
+    return final_prediction
+
+
+
