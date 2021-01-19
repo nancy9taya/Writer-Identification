@@ -14,25 +14,27 @@ from copy import deepcopy
 from skimage.transform import resize
 from skimage.filters import median, gaussian
 
-
-
-
+# def Noise_Removal(path):
+#     image = io.imread(path, as_gray=True)
+#     med_img = median(image, disk(1), mode='constant', cval=0.0)
+#     gaus = gaussian(med_img, sigma=0.4, mode='constant', cval=0.0)
+#     gray = rgb2gray(gaus)
+#     threshold = threshold_otsu(gray)  
+#     Binary = gray > threshold 
+#     Binary = (Binary*255).astype('uint8')
+#     return Binary
 
 def Noise_Removal(path):
     image = io.imread(path, as_gray=True)
     med_img = median(image, disk(1), mode='constant', cval=0.0)
-    gaus = gaussian(med_img, sigma=0.4, mode='constant', cval=0.0)
-    gray = rgb2gray(gaus)
-    threshold = threshold_otsu(gray)  
-    Binary = gray > threshold 
-    Binary = (Binary*255).astype('uint8')
-    return Binary
-
-
-
-
-
-
+    blur = cv2.blur(med_img,(1,1))
+    _,thresh = cv2.threshold(blur,240,255,cv2.THRESH_BINARY)
+    # gaus = gaussian(med_img, sigma=0.4, mode='constant', cval=0.0)
+    gray = rgb2gray(thresh)
+    # threshold = threshold_otsu(gray)  
+    # Binary = gray > threshold 
+    # Binary = (Binary*255).astype('uint8')
+    return gray
 def cropImage(Binary):
     scale= 900/Binary.shape[0]
     resized_img = resize(Binary, ( int(Binary.shape[0] *scale), int(Binary.shape[1] * scale)))
@@ -60,10 +62,6 @@ def cropImage(Binary):
     cropedImage = resized_img[uniques[1]+5:uniques[2]-5, :]
     cv2.imwrite('croped_image.png', cropedImage)
     return cropedImage
-
-
-
-
  
 def getLines(cropedImage):   
     linesArray = []
@@ -89,3 +87,22 @@ def getLines(cropedImage):
 
     cv2.imwrite("outputs/result.png", Neg )
     return linesArray
+
+
+# path = "training (2).png"
+# Binary=  Noise_Removal(path)
+# cropedImage = cropImage(Binary)
+# array = getLines(cropedImage)
+# print("enddd")
+# im = array[0]
+# # gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+
+# blur = cv2.blur(im,(1,1))
+# _,thresh = cv2.threshold(blur,240,255,cv2.THRESH_BINARY)
+# cv2.imwrite('arwap.png', thresh)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
+
+
+
+    
