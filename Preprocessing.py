@@ -16,8 +16,6 @@ from skimage.filters import median, gaussian
 
 
 
-
-
 def Noise_Removal(path):
     image = io.imread(path, as_gray=True)
     med_img = median(image, disk(1), mode='constant', cval=0.0)
