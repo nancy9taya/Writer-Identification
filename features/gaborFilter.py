@@ -13,7 +13,7 @@ def gabor_filter_bank():
                 kernel = np.real(gabor_kernel(frequency, theta=theta,
                                               sigma_x=sigma, sigma_y=sigma))
                 kernels.append(kernel)
-    return kernels   
+    return kernels     
 
 # calculte features  [local energy,mean amplitude]        
 def calculate_gabor_featuers(imageBinay ,kernels):
@@ -21,14 +21,15 @@ def calculate_gabor_featuers(imageBinay ,kernels):
 
     #calculating the local energy for each convolved image
     for i in range(len(kernels)):
-        response = cv2.filter2D(img, cv2.CV_8UC3, kernels[i])#convolution
+        response = cv2.filter2D(imageBinay, cv2.CV_8UC3, kernels[i])#convolution
         squareElement = np.square(response)
         total =np.sum(squareElement)
         featuers.append(total )
     #calculating the mean amplitude for each convolved image
     for i in range(len(kernels)):
-        response = cv2.filter2D(img, cv2.CV_8UC3, kernels[i])#convolution
+        response = cv2.filter2D(imageBinay, cv2.CV_8UC3, kernels[i])#convolution
         absElement = np.absolute(response)
         total =np.sum(absElement)
         featuers.append(total )
     return featuers
+

@@ -21,10 +21,7 @@ from skimage.filters import median, gaussian
 def Noise_Removal(path):
     image = io.imread(path, as_gray=True)
     med_img = median(image, disk(1), mode='constant', cval=0.0)
-    # blurred = skimage.filters.gaussian(
-    # image, sigma=(sigma, sigma), truncate=3.5, multichannel=True)
-    gaus = gaussian(med_img, sigma=0.4, mode='constant', cval=0.0)
-    gray = rgb2gray(gaus)
+    gray = rgb2gray(med_img)
     threshold = threshold_otsu(gray)  
     Binary = gray > threshold 
     Binary = (Binary*255).astype('uint8')
@@ -63,6 +60,29 @@ def cropImage(Binary):
     cv2.imwrite('croped_image.png', cropedImage)
     return cropedImage
 
+def RemoveBLackEdge(cropedImage):
+    img = cropedImage.T
+    w,h=img.shape
+    sens=1.0 # (0-1]
+    meanofimg=np.mean(img)*sens
+    dataw=[w,0]
+    datah=[h,0]
+    for i in range(w):
+        if np.mean(img[i])>meanofimg:
+            if i<dataw[0]:
+                dataw[0]=i
+            else:
+                dataw[1]=i
+    img=img.T
+    meanofimg=np.mean(img)*sens
+    for i in range(h):
+        if np.mean(img[i])>meanofimg:
+            if i<datah[0]:
+                datah[0]=i
+            else:
+                datah[1]=i
+    img=img[datah[0]:datah[1],dataw[0]:dataw[1]]
+    return img
 
 
 
@@ -75,12 +95,13 @@ def getLines(cropedImage):
     H,W = cropedImage.shape[:2]
     uppers = [y for y in range(H-1) if hist[y]<=th and hist[y+1]>th]
     lowers = [y for y in range(H-1) if hist[y]>th and hist[y+1]<=th]
-    Neg = 255- threshed
+    Neg = cropedImage
     if(len(uppers) == len(lowers)):
         for i in range(len(uppers)):
             if(abs(uppers[i] -lowers[i]) >= 10):
                 linesArray.append(Neg [uppers[i]+2:lowers[i]+2,:])
-                cv2.imwrite("outputs/line"+str(i)+".png", Neg [uppers[i]+2:lowers[i]+2,:])
+                line = Neg [uppers[i]+2:lowers[i]+2,:]
+                cv2.imwrite("outputs/line"+str(i)+".jpg",line)
 
     #just for visualizing
     for y in uppers:
@@ -100,5 +121,6 @@ def getLines(cropedImage):
 def preprocessImage(path):
     binImage=Noise_Removal(path)
     croppedImage=cropImage(binImage)
-    segmentedLines=getLines(croppedImage)
+    fineImage = RemoveBLackEdge(croppedImage)
+    segmentedLines=getLines(fineImage)
     return  segmentedLines
