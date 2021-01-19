@@ -27,14 +27,20 @@ from skimage.filters import median, gaussian
 def Noise_Removal(path):
     image = io.imread(path, as_gray=True)
     med_img = median(image, disk(1), mode='constant', cval=0.0)
-    blur = cv2.blur(med_img,(1,1))
-    _,thresh = cv2.threshold(blur,240,255,cv2.THRESH_BINARY)
-    # gaus = gaussian(med_img, sigma=0.4, mode='constant', cval=0.0)
-    gray = rgb2gray(thresh)
-    # threshold = threshold_otsu(gray)  
-    # Binary = gray > threshold 
-    # Binary = (Binary*255).astype('uint8')
-    return gray
+    # blurred = skimage.filters.gaussian(
+    # image, sigma=(sigma, sigma), truncate=3.5, multichannel=True)
+    gaus = gaussian(med_img, sigma=0.4, mode='constant', cval=0.0)
+    gray = rgb2gray(gaus)
+    threshold = threshold_otsu(gray)  
+    Binary = gray > threshold 
+    Binary = (Binary*255).astype('uint8')
+    return Binary
+
+
+
+
+
+
 def cropImage(Binary):
     scale= 900/Binary.shape[0]
     resized_img = resize(Binary, ( int(Binary.shape[0] *scale), int(Binary.shape[1] * scale)))
@@ -89,20 +95,12 @@ def getLines(cropedImage):
     return linesArray
 
 
-# path = "training (2).png"
-# Binary=  Noise_Removal(path)
-# cropedImage = cropImage(Binary)
-# array = getLines(cropedImage)
-# print("enddd")
-# im = array[0]
-# # gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
-# blur = cv2.blur(im,(1,1))
-# _,thresh = cv2.threshold(blur,240,255,cv2.THRESH_BINARY)
-# cv2.imwrite('arwap.png', thresh)
-# cv2.waitKey()
-# cv2.destroyAllWindows()
-
-
-
-    
+"""
+    Preprocessing Steps
+"""
+def preprocessImage(path):
+    binImage=Noise_Removal(path)
+    croppedImage=cropImage(binImage)
+    segmentedLines=getLines(croppedImage)
+    return  segmentedLines
