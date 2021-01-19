@@ -13,7 +13,9 @@ def gabor_filter_bank():
                 kernel = np.real(gabor_kernel(frequency, theta=theta,
                                               sigma_x=sigma, sigma_y=sigma))
                 kernels.append(kernel)
-    return kernels             
+    return kernels     
+
+# calculte features  [local energy,mean amplitude]        
 def calculate_gabor_featuers(imageBinay ,kernels):
     featuers = []
 
@@ -30,3 +32,4 @@ def calculate_gabor_featuers(imageBinay ,kernels):
         total =np.sum(absElement)
         featuers.append(total )
     return featuers
+
