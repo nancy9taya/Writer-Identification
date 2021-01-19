@@ -11,9 +11,9 @@ import imutils
 
 def ConnectedComponents (img):
     backtorgb = img.copy()
-    img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]  
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    # img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)[1]  
+    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(backtorgb, (5, 5), 0)
     # perform edge detection, find contours in the edge map, and sort the
     # resulting contours from left-to-right
     edged = cv2.Canny(blurred, 30, 150)
@@ -23,6 +23,7 @@ def ConnectedComponents (img):
     backtorgb = cv2.cvtColor(edged.copy(),cv2.COLOR_GRAY2RGB)
     img2 =backtorgb.copy()
     bounding_rect = np.zeros((len(contours), 5))
+
 
     for i in range(0, len(contours )):
             # imm = img2.copy()
@@ -36,25 +37,39 @@ def ConnectedComponents (img):
             # cv2.imwrite(stre, imm)
             # cv2.waitKey()
             # cv2.destroyAllWindows()
-                        
+    
+ 
     # Show the image with contours
     # cv2.imwrite(path+'arwa.png', img2)
     # cv2.waitKey()
     # cv2.destroyAllWindows()
 
     bounding_rect = bounding_rect[~np.all(bounding_rect == 0, axis=1)]
+    # print("BOUNDING RETTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+    # print(bounding_rect)
     
     #getting aspect ratio
     h_to_w_ratio = np.average(bounding_rect[:, 4], axis=0)
+    # print("HHHHHHHH TOOOOOO WWWWWWWWWWWWW")
+    # print(h_to_w_ratio)
 
     #sort contrours based on top left 
     bounding_rect_sorted = bounding_rect[bounding_rect[:, 0].argsort()]
   
     #distance between each bounding box - width of the first bounding bx to get the distance between two bounding boxes
-    diff_dist_word = np.diff(bounding_rect_sorted, axis=0)[:, 0] - bounding_rect_sorted[:-1, 2]
+    diff_dist_word = np.abs(np.diff(bounding_rect_sorted, axis=0)[:, 0] - bounding_rect_sorted[:-1, 2])
     threshold = np.average(np.abs(np.diff(bounding_rect_sorted, axis=0)[:, 0] - bounding_rect_sorted[:-1, 2]))
-        
+    # print("THRSHOLDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+    # print(threshold)
+    # print("DIFFFFFFFFFFFFFFFFFFFFFFDIST")
+    # print(diff_dist_word)
+    
+    # print("\nWordddd disttttt Avergareeeee\n")
+    # print(diff_dist_word[np.where(diff_dist_word > threshold)])
     word_dist = np.average(diff_dist_word[np.where(diff_dist_word > threshold)])
+
+    # print("\nWITHIN   Wordddd disttttt Avergareeeee\n")
+    # print(np.abs(diff_dist_word[np.where(diff_dist_word < threshold)]))
     within_word_dist = np.average(np.abs(diff_dist_word[np.where(diff_dist_word < threshold)]))
     #  if line consists of only one word
     if math.isnan(word_dist):
@@ -68,5 +83,5 @@ def ConnectedComponents (img):
             
     return np.asarray([word_dist, within_word_dist, sdW, MedianW, AverageW, h_to_w_ratio])
 
-img = cv2.imread("outputs\line19.png")
-print(ConnectedComponents(img) )
+# img = cv2.imread("outputs\line19.png")
+# print(ConnectedComponents(img) )

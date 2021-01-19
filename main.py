@@ -14,9 +14,9 @@ import threading
 import time
 
 
-X_train1=[]
-X_train2=[]
-X_train3=[]
+# X_train1=[]
+# X_train2=[]
+# X_train3=[]
 
 Y_train1=[]
 Y_train2=[]
@@ -25,8 +25,8 @@ Y_train3=[]
 X_test=[]
 Y_test=[]
 
-X_Train=[]
-Y_Train=[]
+# X_Train=[]
+# Y_Train=[]
 times=[]
 preds=[]
 
@@ -46,10 +46,18 @@ def processImages(X,Y,y,imgPath):
         X.append(getFeatureVector(line)) 
 
 def processTestImage(imgPath):
+    print("imageeee pathhhhh",imgPath)
     segmentedLines=preprocessImage(imgPath)
+    print(segmentedLines)
+    # print("XXXXXXXXXXXXXXXXXXXXXXTESSSSSSSSSSSSSSSSSSSSSSST")
+    # print(X_test)
     for line in segmentedLines:
+        # print("IN LOOOOOOPPPPPP")
         X_test.append(getFeatureVector(line))
-    return X_test,len(segmentedLines)
+        # print(X_test)
+    # print("AFTERRRRR LOOOOOP")
+    # print(X_test)
+    return X_test
 """
 formsA-D 529
 formsE-H 395
@@ -71,28 +79,30 @@ def writePrediction(pred,time):
 
 
 def ReadData(testDataPath):
-    global X_Train
-    global Y_Train
-    global X_test
     iteration_Folders=os.listdir(testDataPath)
+    global X_test
     for idx,folder in enumerate(iteration_Folders):
-        print("Test Case ..............", idx)
+        start = time.time()
+        X_Train=[]
+        Y_Train=[]
+        X_test=[]
+        X_train1=[]
+        X_train2=[]
+        Y_train1=[]
+        Y_train2=[]
+        print("Test Case ..............", idx+1)
         writers_folder=os.listdir(str(testDataPath+"/"+folder))
         if len(writers_folder)==0:
             continue;
-        if idx==5: ####################################to be removed 
-            return
+        # if idx==29: ####################################to be removed 
+            # return
         # print(writers_folder)
         for i in range(4): # loop over writers folders and test image
             writer_folder=writers_folder[i]
             if i==3:
                 testPath=str(testDataPath+"/"+folder+"/"+writer_folder)
-                start = time.time()
-                _,cntLines=processTestImage(testPath)
-                Cnt_segmentedLines.append(cntLines)
-                end=time.time()
-                print("Time Ellapsed ", end-start," seconds")
-                times.append(end-start)
+                processTestImage(testPath)
+                # Cnt_segmentedLines.append(cntLines)
                 continue
             imgs=os.listdir(str(testDataPath+"/"+folder+"/"+writer_folder))
             t1=None
@@ -121,11 +131,11 @@ def ReadData(testDataPath):
         print("PREDICTION BEGINS NOW ! ...............")
         # print(X_test)
         pred=predict_clf(X_test,Y_test)
+        end=time.time()
+        print("Time Ellapsed ", end-start," seconds")
+        times.append(end-start)
         writePrediction(pred,end-start)
         print(pred)
-        X_Train=[]
-        Y_Train=[]
-        X_test=[]
 
 
 ResultsFolder="Results"

@@ -4,9 +4,10 @@ import cv2
 
 def fractal_dimension(img, threshold=0.9):
     
-    Z = cv2.imread(img , 0)/256.0
+    Z = (img*255)/256.0 ##cv2.imread(img , 0)/256.0
     # Only for 2d image
     assert(len(Z.shape) == 2)
+    # print("FRACTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
     def boxcount(Z, k):
         S = np.add.reduceat(
@@ -39,7 +40,8 @@ def fractal_dimension(img, threshold=0.9):
     
     # Fit the successive log(sizes) with log (counts)
     coeffs = np.polyfit(np.log(sizes), np.log(counts), 1)
-    return -coeffs[0]
+    # print("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    return -1*coeffs[0]
 
 
 

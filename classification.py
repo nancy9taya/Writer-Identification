@@ -22,6 +22,9 @@ def training(x_train,y_train):
 
 def predict_clf(X_test, Y_test):
     global votingClf
+    # print(X_test)
+    # if X_test.shape==1:
+        # X_test.reshape((-1,1))
     prediction = votingClf.predict(X_test)
     print(prediction)
     final_prediction=np.bincount(prediction).argmax()
