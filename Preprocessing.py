@@ -100,6 +100,18 @@ def getLines(cropedImage):
                 linesArray.append(Neg [uppers[i]+2:lowers[i]+2,:])
                 line = Neg [uppers[i]+2:lowers[i]+2,:]
                 cv2.imwrite("outputs/line"+str(i)+".jpg",line)
+    elif(len(uppers) > len(lowers)):
+        for i in range(len(lowers)):
+            if(abs(uppers[i] -lowers[i]) >= 10):
+                linesArray.append(Neg [uppers[i]+2:lowers[i]+2,:])
+                line = Neg [uppers[i]+2:lowers[i]+2,:]
+                cv2.imwrite("outputs/line"+str(i)+".jpg",line)
+    elif(len(uppers) < len(lowers)):
+        for i in range(len(uppers)):
+            if(abs(uppers[i] -lowers[i]) >= 10):
+                linesArray.append(Neg [uppers[i]+2:lowers[i]+2,:])
+                line = Neg [uppers[i]+2:lowers[i]+2,:]
+                cv2.imwrite("outputs/line"+str(i)+".jpg",line)
 
     #just for visualizing
     for y in uppers:
