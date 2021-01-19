@@ -17,7 +17,6 @@ def extractContours(line):
         x,y,w,h = cv2.boundingRect(c)
 
         if(h*w) > 50  :
-            print(w*h)
             xmin = x+padding
             xmax = x + w +padding
             ymin = y  +padding
