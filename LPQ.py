@@ -1,7 +1,30 @@
-
+import cv2 
 import numpy as np
 from scipy.signal import convolve2d
 
+
+def extractContours(line):
+    image = line
+    blur = cv2.GaussianBlur(image, (7,7), 0)
+    thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,1))
+    dilate = cv2.dilate(thresh, kernel, iterations=4)
+    cnts = cv2.findContours(dilate, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+    extractedImages = []
+    padding = 2
+    for c in cnts:
+        x,y,w,h = cv2.boundingRect(c)
+
+        if(h*w) > 50  :
+            print(w*h)
+            xmin = x+padding
+            xmax = x + w +padding
+            ymin = y  +padding
+            ymax = y + h +padding
+            extractedImages.append(image[ymin: ymax,xmin:xmax])  
+
+    return extractedImages
 
 #img is line image from segemntation
 def LPQ(img,winSize=3):
@@ -36,11 +59,13 @@ def LPQ(img,winSize=3):
     ## Perform quantization and compute LPQ codewords
     inds = np.arange(freqResp.shape[2])[np.newaxis,np.newaxis,:]
     LPQdesc=((freqResp>0)*(2**inds)).sum(2)
-
-
     LPQdesc=np.histogram(LPQdesc.flatten(),range(256))[0]
-
     LPQdesc=LPQdesc/LPQdesc.sum()
-
-   
     return LPQdesc
+
+
+def applyLPQ(extractedImages):
+    featuers = []
+    for i in range(len(extractedImages)):  
+        featuers.append(LPQ(extractedImages[i]).tolist())
+    return featuers
