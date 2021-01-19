@@ -1,6 +1,5 @@
 formsA-D/
 formsA-D.tgz
-<<<<<<< HEAD
 formsE-H.tgz
 formsE-H/
 formsl-Z.tgz
@@ -10,7 +9,6 @@ __pycache__/
 HistogramTest/
 classiftmp.txt
 testcreator.py
-=======
 n
 outputs/
 n1
@@ -19,4 +17,4 @@ training (1).png
 training (2).png
 arwa/
 demofile2
->>>>>>> ec4fd8dbcc7b8814d9236d0d633c6e0a09c32033
+TestData/
