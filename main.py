@@ -13,11 +13,9 @@ import csv
 import threading
 import time
 
+testDataPath="TestData"  ## Change this to be path of folder of test data set
 
-# X_train1=[]
-# X_train2=[]
-# X_train3=[]
-
+num_Iterations=0
 Y_train1=[]
 Y_train2=[]
 Y_train3=[]
@@ -42,46 +40,33 @@ writer_3="3"
 def processImages(X,Y,y,imgPath):
     segmentedLines=preprocessImage(imgPath)
     for line in segmentedLines:
-        Y.append(y)
-        X.append(getFeatureVector(line)) 
+        if len(line)==0:
+            continue
+        r=getFeatureVector(line.copy())
+        if len(r)!=0:
+            Y.append(y)
+            X.append(r)
 
 def processTestImage(imgPath):
-    print("imageeee pathhhhh",imgPath)
     segmentedLines=preprocessImage(imgPath)
-    print(segmentedLines)
-    # print("XXXXXXXXXXXXXXXXXXXXXXTESSSSSSSSSSSSSSSSSSSSSSST")
-    # print(X_test)
+    # print(segmentedLines)
     for line in segmentedLines:
-        # print("IN LOOOOOOPPPPPP")
         X_test.append(getFeatureVector(line))
-        # print(X_test)
-    # print("AFTERRRRR LOOOOOP")
-    # print(X_test)
     return X_test
-"""
-formsA-D 529
-formsE-H 395
-formsl-Z 458
-forms.txt 
-"""
-testDataPath="TestData"
 
-"""
-# Transfrm ASCII txt file to CSV
-# df = pd.read_csv('ascii/forms.csv',sep='\s+',header=None)
-# df.to_csv('ascii/form_out.csv',header=None)
-"""
 def writePrediction(pred,time):
     fr.write(str(pred))
     fr.write("\n")
+    time = str(round(time, 2))
     ft.write(str(time))
     ft.write("\n")
 
 
-def ReadData(testDataPath):
+def ReadData(testDataPath,num_Iterations):
     iteration_Folders=os.listdir(testDataPath)
     global X_test
-    for idx,folder in enumerate(iteration_Folders):
+    for i in range(num_Iterations):
+        folder=iteration_Folders[i]
         start = time.time()
         X_Train=[]
         Y_Train=[]
@@ -90,26 +75,20 @@ def ReadData(testDataPath):
         X_train2=[]
         Y_train1=[]
         Y_train2=[]
-        print("Test Case ..............", idx+1)
+        print("Test Case ..............", i+1)
         writers_folder=os.listdir(str(testDataPath+"/"+folder))
         if len(writers_folder)==0:
             continue;
-        # if idx==29: ####################################to be removed 
-            # return
-        # print(writers_folder)
         for i in range(4): # loop over writers folders and test image
             writer_folder=writers_folder[i]
             if i==3:
                 testPath=str(testDataPath+"/"+folder+"/"+writer_folder)
                 processTestImage(testPath)
-                # Cnt_segmentedLines.append(cntLines)
                 continue
             imgs=os.listdir(str(testDataPath+"/"+folder+"/"+writer_folder))
             t1=None
             t2=None
             for idx,img in enumerate(imgs):
-                # print("Curreeeenttttt image",img)
-                # print("IDXXXXXXXXXXXXXXXXXX",idx)
                 if idx==0:
                     imgPath=str(testDataPath+"/"+folder+"/"+writer_folder+"/"+img)
                     t1 = threading.Thread(target=processImages, args=(X_train1,Y_train1,i+1,imgPath)) 
@@ -120,7 +99,9 @@ def ReadData(testDataPath):
                     t2 =threading.Thread(target=processImages, args=(X_train2,Y_train2,i+1,imgPath)) 
                     t2.start()
             t1.join()
+            # print("t1",t1.is_alive())
             t2.join()
+            # print("t2",t1.is_alive())
             print("Extracting features.....................")
             X_Train.extend(X_train1)
             X_Train.extend(X_train2)
@@ -138,9 +119,14 @@ def ReadData(testDataPath):
         print(pred)
 
 
-ResultsFolder="Results"
-ft = open(ResultsFolder+"/time.txt", "a")
-fr = open(ResultsFolder+"/results.txt", "a")
-ReadData("TestData")
+# ResultsFolder="Results"
+if os.path.exists(str(testDataPath+"/results.txt")):
+    os.remove(str(testDataPath+"/results.txt"))
+if os.path.exists(str(testDataPath+"/time.txt")):
+    os.remove(str(testDataPath+"/time.txt"))
+num_Iterations=len(os.listdir(testDataPath))
+ft = open(testDataPath+"/time.txt", "a")
+fr = open(testDataPath+"/results.txt", "a")
+ReadData(testDataPath,num_Iterations)
 ft.close()
 fr.close()

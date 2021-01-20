@@ -32,7 +32,7 @@ def LBP(image, eps=1e-7):
     (hist, _) = np.histogram(lbp.ravel(),bins=n_bins,range=(0, n_bins))
     #plt.hist(lbp.ravel(),bins=n_bins,range=(0, n_bins))
     # normalize the histogram
-    print(hist)
+    # print(hist)
     hist = hist.astype("float")
     hist /= (hist.sum() + eps)
     # return the histogram of Local Binary Patterns

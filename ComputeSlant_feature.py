@@ -58,36 +58,3 @@ def AnglesHistogram(image):
 
     # print(np.divide(anglesHist, countBlack))
     return np.divide(anglesHist, countBlack)
-    # end_angle = start_angle+interval
-    # closedInterval=False
-
-    # while end_angle <180:
-    #     onesAngles=angles.copy()
-    #     anglesCopy=angles.copy()
-    #     """
-    #     mask the angles inside the interval with 1 , and outside interval with zero.
-    #     if the angle equals one of stop points interval
-    #     count it in the interval which angle=end_angle
-    #     """
-    #     if closedInterval:
-    #         onesAngles[np.logical_and(start_angle<= anglesCopy, anglesCopy <= end_angle)] = 1
-    #     else:
-    #         onesAngles[np.logical_and(start_angle< anglesCopy, anglesCopy < end_angle)] = 1
-    #     onesAngles[onesAngles!=1] = 0
-    #     anglesDist.append(np.sum(onesAngles))
-    #     start_angle += interval
-    #     end_angle += interval
-    #     closedInterval=not(closedInterval)
-    # print(anglesDist," ",np.sum(anglesDist))
-    # anglesDist=np.divide(anglesDist,totalEdges)
-    # print(anglesDist)
-    # return anglesDist
-
-# def main():
-#     a = np.array([255,255, 0, 0, 0,255, 0,255,255,255,0,255,0,0,255,255,255,255,0,0,0,0,255,255,0,255,0,0,255,255])
-
-#     x = a.reshape(6, 5)
-#     AnglesHistogram(x)
-
-# if __name__ == "__main__":
-#     main()

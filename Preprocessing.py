@@ -31,6 +31,7 @@ def Noise_Removal(path):
 
 
 def cropImage(Binary):
+    
     scale= 900/Binary.shape[0]
     resized_img = resize(Binary, ( int(Binary.shape[0] *scale), int(Binary.shape[1] * scale)))
     resized_img  = (resized_img*255).astype('uint8') 
@@ -38,25 +39,30 @@ def cropImage(Binary):
     horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25,1))
     detected_lines = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, horizontal_kernel, iterations=3)# apply openenig
     edges = cv2.Canny(detected_lines,50,150,apertureSize = 3)
+    n=None
     lines = cv2.HoughLinesP(image=edges,rho = 1,theta = 1*np.pi/180,threshold = 100,minLineLength = 100,maxLineGap = 50)
-    a,b,c = lines.shape
-    vertices = [ ]
-    for i in range(a):
-        vertices.append(lines[i][0][1])
+    if type(lines)!=type(n):
+        a,b,c = lines.shape
+        vertices = [ ]
+        for i in range(a):
+            vertices.append(lines[i][0][1])
 
-    vertices = sorted(vertices)
-    vertices =np.array(vertices)
-    dif = vertices[1:] - vertices[:-1]
-    # get the index where you first observe a jump
-    fi =  np.where(abs(dif) > 5)
-    out = [item for t in fi for item in t] 
-    uniques=[]
-    uniques= [vertices[i+1] for i in out ]
-    uniques.insert(0,vertices[0])
-    uniques = sorted(uniques)
-    cropedImage = resized_img[uniques[1]+5:uniques[2]-5, :]
-    cv2.imwrite('croped_image.png', cropedImage)
-    return cropedImage
+        vertices = sorted(vertices)
+        vertices =np.array(vertices)
+        dif = vertices[1:] - vertices[:-1]
+        # get the index where you first observe a jump
+        fi =  np.where(abs(dif) > 5)
+        out = [item for t in fi for item in t] 
+        uniques=[]
+        uniques= [vertices[i+1] for i in out ]
+        uniques.insert(0,vertices[0])
+        uniques = sorted(uniques)
+        cropedImage = resized_img[uniques[1]+5:uniques[2]-5, :]
+        # cv2.imwrite('croped_image.png', cropedImage)
+        return cropedImage
+    else:
+        return  resized_img 
+        
 
 def RemoveBLackEdge(cropedImage):
     img = cropedImage.T
@@ -83,7 +89,6 @@ def RemoveBLackEdge(cropedImage):
     return img
 
 
-
  
 def getLines(cropedImage):   
     linesArray = []
@@ -94,33 +99,41 @@ def getLines(cropedImage):
     uppers = [y for y in range(H-1) if hist[y]<=th and hist[y+1]>th]
     lowers = [y for y in range(H-1) if hist[y]>th and hist[y+1]<=th]
     Neg = cropedImage
+    uppers= [i for i in uppers if i != 0]
+    lowers= [i for i in lowers if i != 0]
+
     if(len(uppers) == len(lowers)):
         for i in range(len(uppers)):
             if(abs(uppers[i] -lowers[i]) >= 10):
                 linesArray.append(Neg [uppers[i]+2:lowers[i]+2,:])
                 line = Neg [uppers[i]+2:lowers[i]+2,:]
-                cv2.imwrite("outputs/line"+str(i)+".jpg",line)
+                # cv2.imwrite("outputs/line"+str(i)+".jpg",line)
     elif(len(uppers) > len(lowers)):
         for i in range(len(lowers)):
             if(abs(uppers[i] -lowers[i]) >= 10):
                 linesArray.append(Neg [uppers[i]+2:lowers[i]+2,:])
                 line = Neg [uppers[i]+2:lowers[i]+2,:]
-                cv2.imwrite("outputs/line"+str(i)+".jpg",line)
+                # cv2.imwrite("outputs/line"+str(i)+".jpg",line)
     elif(len(uppers) < len(lowers)):
         for i in range(len(uppers)):
             if(abs(uppers[i] -lowers[i]) >= 10):
                 linesArray.append(Neg [uppers[i]+2:lowers[i]+2,:])
                 line = Neg [uppers[i]+2:lowers[i]+2,:]
-                cv2.imwrite("outputs/line"+str(i)+".jpg",line)
-
+                # cv2.imwrite("outputs/line"+str(i)+".jpg",line)
+    
+    
     #just for visualizing
     for y in uppers:
-        cv2.line(Neg , (0,y), (W, y), (255,0,0), 1)
+        cv2.line(Neg , (0,y), (W, y), (0,255,0), 1)
 
     for y in lowers:
         cv2.line(Neg , (0,y), (W, y), (0,255,0), 1)
 
-    cv2.imwrite("outputs/result.png", Neg )
+    # cv2.imshow("outputs/result.png", Neg )
+    cv2.waitKey()
+    cv2.destroyAllWindows()         
+
+
     return linesArray
 
 

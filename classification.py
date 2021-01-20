@@ -12,7 +12,7 @@ def training(x_train,y_train):
 
     votingClf = VotingClassifier([('clf1',SVC(probability=True)),('clf2',DecisionTreeClassifier())],voting='soft') #
     learnRate=1.5
-    numClassifiers=50;
+    numClassifiers=25;
     votingClf = AdaBoostClassifier(base_estimator = votingClf,  n_estimators=numClassifiers,
                                  learning_rate=learnRate,
                                  algorithm="SAMME")
@@ -26,7 +26,7 @@ def predict_clf(X_test, Y_test):
     # if X_test.shape==1:
         # X_test.reshape((-1,1))
     prediction = votingClf.predict(X_test)
-    print(prediction)
+    # print(prediction)
     final_prediction=np.bincount(prediction).argmax()
     # final_prediction=np.argmax(array, axis = 1)) 
     print("Prediction:", final_prediction)

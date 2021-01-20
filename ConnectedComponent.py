@@ -33,43 +33,21 @@ def ConnectedComponents (img):
             # cv2.rectangle(img2, (x,y), (x + w, y + h), (0,255,0), 1)
             # cv2.rectangle(imm, (x,y), (x + w, y + h), (0,255,0), 1)
             bounding_rect[i] = (int(x), int(y), int(w), int(h), float(h / w))   
-            # stre = 'width '+str(w)+'.png'
-            # cv2.imwrite(stre, imm)
-            # cv2.waitKey()
-            # cv2.destroyAllWindows()
-    
  
-    # Show the image with contours
-    # cv2.imwrite(path+'arwa.png', img2)
-    # cv2.waitKey()
-    # cv2.destroyAllWindows()
 
     bounding_rect = bounding_rect[~np.all(bounding_rect == 0, axis=1)]
-    # print("BOUNDING RETTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
-    # print(bounding_rect)
+
     
     #getting aspect ratio
     h_to_w_ratio = np.average(bounding_rect[:, 4], axis=0)
-    # print("HHHHHHHH TOOOOOO WWWWWWWWWWWWW")
-    # print(h_to_w_ratio)
-
     #sort contrours based on top left 
     bounding_rect_sorted = bounding_rect[bounding_rect[:, 0].argsort()]
   
     #distance between each bounding box - width of the first bounding bx to get the distance between two bounding boxes
     diff_dist_word = np.abs(np.diff(bounding_rect_sorted, axis=0)[:, 0] - bounding_rect_sorted[:-1, 2])
     threshold = np.average(np.abs(np.diff(bounding_rect_sorted, axis=0)[:, 0] - bounding_rect_sorted[:-1, 2]))
-    # print("THRSHOLDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
-    # print(threshold)
-    # print("DIFFFFFFFFFFFFFFFFFFFFFFDIST")
-    # print(diff_dist_word)
-    
-    # print("\nWordddd disttttt Avergareeeee\n")
-    # print(diff_dist_word[np.where(diff_dist_word > threshold)])
     word_dist = np.average(diff_dist_word[np.where(diff_dist_word > threshold)])
 
-    # print("\nWITHIN   Wordddd disttttt Avergareeeee\n")
-    # print(np.abs(diff_dist_word[np.where(diff_dist_word < threshold)]))
     within_word_dist = np.average(np.abs(diff_dist_word[np.where(diff_dist_word < threshold)]))
     #  if line consists of only one word
     if math.isnan(word_dist):
@@ -77,11 +55,8 @@ def ConnectedComponents (img):
     if math.isnan(within_word_dist):
         within_word_dist = 0
 
-    sdW = np.sqrt(np.var(bounding_rect_sorted[:, 2])) # varies in a specific range
+    sdW = np.std(bounding_rect_sorted[:, 2]) # varies in a specific range
     MedianW = np.median(bounding_rect_sorted[:, 2]) # in the middle of all numbers
     AverageW = np.average(bounding_rect_sorted[:, 2]) #mean
             
     return np.asarray([word_dist, within_word_dist, sdW, MedianW, AverageW, h_to_w_ratio])
-
-# img = cv2.imread("outputs\line19.png")
-# print(ConnectedComponents(img) )
