@@ -51,7 +51,7 @@ def cropImage(Binary):
         vertices =np.array(vertices)
         dif = vertices[1:] - vertices[:-1]
         # get the index where you first observe a jump
-        fi =  np.where(abs(dif) > 5)
+        fi =  np.where(abs(dif) > 20)
         out = [item for t in fi for item in t] 
         uniques=[]
         uniques= [vertices[i+1] for i in out ]
@@ -101,6 +101,10 @@ def getLines(cropedImage):
     Neg = cropedImage
     uppers= [i for i in uppers if i != 0]
     lowers= [i for i in lowers if i != 0]
+    if(lowers[0] < uppers[0] and len(lowers)>len(uppers)):
+        lowers = lowers[1:]
+    if(lowers[0] < uppers[0] and len(lowers)<len(uppers)):
+        uppers = uppers[1:]
 
     if(len(uppers) == len(lowers)):
         for i in range(len(uppers)):
